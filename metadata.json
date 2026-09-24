@@ -1,0 +1,6 @@
+{
+  "name": "Hospital Management System",
+  "description": "Comprehensive PHP Laravel & Blade Hospital Management System with role-based access control, patient care, pharmacy, appointments, admissions, and billing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
