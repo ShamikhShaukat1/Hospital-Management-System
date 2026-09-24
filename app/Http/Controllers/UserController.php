@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HospitalSetting;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -17,14 +19,20 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
-        $users = $query->paginate(15)->withQueryString();
+        $users = $query->latest()->paginate(15)->withQueryString();
 
         return view('users.index', compact('users'));
     }
@@ -34,23 +42,20 @@ class UserController extends Controller
         return view('users.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:super_admin,admin,doctor,nurse,receptionist,pharmacist,accountant,patient',
-            'phone' => 'nullable|string|max:20',
-            'status' => 'required|in:active,inactive',
-        ]);
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
 
-        $validated['password'] = Hash::make($validated['password']);
-
-        $user = User::create($validated);
+        $user = User::create($data);
 
         return redirect()->route('users.index')
-            ->with('success', "User {$user->name} created with role {$user->role}.");
+            ->with('success', "User account for {$user->name} created successfully.");
+    }
+
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
     }
 
     public function edit(User $user)
@@ -58,33 +63,42 @@ class UserController extends Controller
         return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:super_admin,admin,doctor,nurse,receptionist,pharmacist,accountant,patient',
-            'phone' => 'nullable|string|max:20',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        if ($request->filled('password')) {
-            $request->validate(['password' => 'min:8|confirmed']);
-            $validated['password'] = Hash::make($request->password);
+        if (Auth::id() == $user->id) {
+            if ($request->status === 'inactive') {
+                return back()->withInput()->withErrors(['status' => 'You cannot set your own active account to inactive.']);
+            }
+            if ($request->role !== $user->role) {
+                return back()->withInput()->withErrors(['role' => 'You cannot modify your own system role.']);
+            }
         }
 
-        $user->update($validated);
+        $data = $request->validated();
 
-        return redirect()->route('users.index')->with('success', "User {$user->name} updated.");
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('users.index')
+            ->with('success', "User {$user->name} details updated successfully.");
     }
 
     public function destroy(User $user)
     {
-        if ($user->id === auth()->id()) {
-            return back()->withErrors(['error' => 'You cannot delete your own active account.']);
+
+        if (Auth::id() == $user->id) {
+            return back()->withErrors(['error' => 'You cannot delete your own logged-in account.']);
         }
 
+        $userName = $user->name;
         $user->delete();
-        return redirect()->route('users.index')->with('success', "User account removed.");
+
+        return redirect()->route('users.index')
+            ->with('success', "User account for {$userName} was removed successfully.");
     }
 }

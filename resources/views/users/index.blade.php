@@ -5,11 +5,32 @@
 
 @section('content')
     <div class="space-y-6">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <form method="GET" action="{{ route('users.index') }}" class="flex items-center gap-3">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search user name, email..."
-                    class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm w-64">
-                <select name="role" class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm">
+        @if (session('success'))
+            <div
+                class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between">
+                <div>{{ session('success') }}</div>
+                <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900">&times;</button>
+            </div>
+        @endif
+
+        @if ($errors->has('error'))
+            <div
+                class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between">
+                <div>{{ $errors->first('error') }}</div>
+                <button onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-900">&times;</button>
+            </div>
+        @endif
+
+        <div
+            class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <form method="GET" action="{{ route('users.index') }}"
+                class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <input type="text" name="search" value="{{ request('search') }}"
+                    placeholder="Search user name, email, phone..."
+                    class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-teal-600">
+
+                <select name="role"
+                    class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
                     <option value="">All Roles</option>
                     <option value="super_admin" {{ request('role') == 'super_admin' ? 'selected' : '' }}>Super Admin
                     </option>
@@ -22,14 +43,30 @@
                     <option value="accountant" {{ request('role') == 'accountant' ? 'selected' : '' }}>Accountant</option>
                     <option value="patient" {{ request('role') == 'patient' ? 'selected' : '' }}>Patient</option>
                 </select>
+
+                <select name="status"
+                    class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                    <option value="">All Statuses</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+
                 <button type="submit"
-                    class="w-full md:w-auto px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-sm font-semibold shadow-sm flex items-center justify-center gap-2 transition">
-                    Filter</button>
+                    class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-sm font-semibold shadow-sm transition">
+                    Filter
+                </button>
+
+                @if (request('search') || request('role') || request('status'))
+                    <a href="{{ route('users.index') }}"
+                        class="text-xs text-slate-500 hover:text-slate-700 font-semibold underline">
+                        Clear filters
+                    </a>
+                @endif
             </form>
 
             <a href="{{ route('users.create') }}"
-                class="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-sm font-semibold flex items-center gap-2">
-                <i class="fas fa-user-shield"></i> Add System User
+                class="w-full md:w-auto px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition">
+                <i class="fas fa-user-plus"></i> Add System User
             </a>
         </div>
 
@@ -48,7 +85,11 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse($users as $user)
                         <tr class="hover:bg-slate-50">
-                            <td class="p-3.5 px-6 font-bold text-slate-900">{{ $user->name }}</td>
+                            <td class="p-3.5 px-6 font-bold text-slate-900">
+                                <a href="{{ route('users.show', $user) }}" class="hover:text-teal-700">
+                                    {{ $user->name }}
+                                </a>
+                            </td>
                             <td class="p-3.5 px-6">{{ $user->email }}</td>
                             <td class="p-3.5 px-6">
                                 <span
@@ -63,16 +104,20 @@
                                     {{ ucfirst($user->status) }}
                                 </span>
                             </td>
-                            <td class="p-3.5 px-6 text-right space-x-1">
+                            <td class="p-3.5 px-6 text-right space-x-2">
+                                <a href="{{ route('users.show', $user) }}" class="p-1.5 text-slate-400 hover:text-teal-600"
+                                    title="View Details">
+                                    <i class="far fa-eye"></i>
+                                </a>
                                 <a href="{{ route('users.edit', $user) }}"
-                                    class="p-1.5 text-slate-400 hover:text-indigo-600" title="Edit">
+                                    class="p-1.5 text-slate-400 hover:text-indigo-600" title="Edit User">
                                     <i class="far fa-edit"></i>
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-slate-400">No users found.</td>
+                            <td colspan="6" class="p-8 text-center text-slate-400">No user accounts found.</td>
                         </tr>
                     @endforelse
                 </tbody>
