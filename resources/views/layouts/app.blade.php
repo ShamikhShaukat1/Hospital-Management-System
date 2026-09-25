@@ -57,13 +57,115 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <div class="relative">
-                        <span
-                            class="inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 cursor-pointer">
+                    <div class="relative" id="notificationContainer">
+                        <button type="button" id="notificationButton"
+                            class="relative inline-flex items-center justify-center p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 cursor-pointer transition-colors focus:outline-none">
+
                             <i class="far fa-bell text-lg"></i>
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-                        </span>
+
+                            @if (auth()->user()->unreadNotifications->count() > 0)
+                                <span
+                                    class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
+                                    {{ auth()->user()->unreadNotifications->count() > 99 ? '99+' : auth()->user()->unreadNotifications->count() }}
+                                </span>
+                            @endif
+                        </button>
+
+                        <div id="notificationDropdown"
+                            class="hidden absolute right-0 mt-3 w-96 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
+                            <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-slate-800">
+                                        Notifications
+                                    </h3>
+
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        {{ auth()->user()->unreadNotifications->count() }} unread
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="max-h-[400px] overflow-y-auto">
+                                @forelse (auth()->user()->notifications()->latest()->take(5)->get() as $notification)
+                                    @php
+                                        $data = $notification->data;
+                                        $isUnread = is_null($notification->read_at);
+                                        $type = $data['type'] ?? 'general';
+
+                                        if ($type === 'appointment_created') {
+                                            $icon = 'fa-calendar-plus';
+                                            $iconClass = 'text-emerald-600 bg-emerald-50';
+                                        } elseif ($type === 'appointment_updated') {
+                                            $icon = 'fa-calendar-pen';
+                                            $iconClass = 'text-blue-600 bg-blue-50';
+                                        } elseif ($type === 'appointment_deleted') {
+                                            $icon = 'fa-calendar-xmark';
+                                            $iconClass = 'text-rose-600 bg-rose-50';
+                                        } else {
+                                            $icon = 'fa-bell';
+                                            $iconClass = 'text-slate-600 bg-slate-100';
+                                        }
+                                    @endphp
+
+                                    <div
+                                        class="px-5 py-4 border-b border-slate-100 last:border-b-0 {{ $isUnread ? 'bg-teal-50/50' : 'bg-white' }} hover:bg-slate-50 transition-colors">
+                                        <div class="flex gap-3">
+                                            <div
+                                                class="w-9 h-9 rounded-lg {{ $iconClass }} flex items-center justify-center flex-shrink-0">
+                                                <i class="fas {{ $icon }} text-sm"></i>
+                                            </div>
+
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <h4 class="text-sm font-semibold text-slate-800 truncate">
+                                                        {{ $data['title'] ?? 'Notification' }}
+                                                    </h4>
+
+                                                    @if ($isUnread)
+                                                        <span
+                                                            class="w-2 h-2 bg-teal-600 rounded-full flex-shrink-0 mt-1.5"></span>
+                                                    @endif
+
+                                                </div>
+
+                                                <p class="text-xs text-slate-500 mt-1 line-clamp-2">
+                                                    {{ $data['message'] ?? '' }}
+                                                </p>
+
+                                                <div class="flex items-center justify-between mt-2">
+                                                    <span class="text-[11px] text-slate-400">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </span>
+
+                                                    @if (!empty($data['url']) && $type !== 'appointment_deleted')
+                                                        <a href="{{ $data['url'] }}"
+                                                            class="text-[11px] font-semibold text-teal-700 hover:text-teal-800">
+                                                            View
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                @empty
+                                    <div class="py-10 text-center">
+                                        <i class="far fa-bell-slash text-2xl text-slate-300"></i>
+
+                                        <p class="text-sm text-slate-500 mt-3">
+                                            No notifications yet.
+                                        </p>
+                                    </div>
+                                @endforelse
+                            </div>
+
+                            <div class="px-5 py-3 bg-slate-50 border-t border-slate-200">
+                                <a href="{{ route('notifications.index') }}"
+                                    class="block text-center text-sm font-semibold text-teal-700 hover:text-teal-800">
+                                    View all notifications
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex items-center pl-3 border-l border-slate-200 space-x-3">
@@ -119,6 +221,32 @@
             @yield('content')
         </main>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const notificationButton = document.getElementById('notificationButton');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationContainer = document.getElementById('notificationContainer');
+
+            if (notificationButton && notificationDropdown) {
+
+                notificationButton.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    notificationDropdown.classList.toggle('hidden');
+
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (notificationContainer && !notificationContainer.contains(event.target)) {
+                        notificationDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+
+    @yield('scripts')
 
     @yield('scripts')
 </body>

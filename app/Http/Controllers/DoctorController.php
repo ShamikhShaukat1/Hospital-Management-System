@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NotificationHelper;
 use App\Http\Requests\StoreDoctorRequest;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DoctorController extends Controller
@@ -17,9 +19,9 @@ class DoctorController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('doctor_id', 'like', "%{$search}%")
-                  ->orWhere('specialization', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('doctor_id', 'like', "%{$search}%")
+                    ->orWhere('specialization', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -31,7 +33,7 @@ class DoctorController extends Controller
             $query->where('status', $request->status);
         }
 
-        $doctors = $query->latest()->paginate(15)->withQueryString();
+        $doctors = $query->latest()->paginate(10)->withQueryString();
         $departments = Department::where('status', 'active')->get();
 
         return view('doctors.index', compact('doctors', 'departments'));
@@ -53,6 +55,19 @@ class DoctorController extends Controller
             $request->validated(),
             ['doctor_id' => $doctorId]
         ));
+
+        $doctor->load(['department', 'user']);
+        $usersToNotify = $this->getDoctorRecipients($doctor);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'New Doctor Added',
+            message: "Dr. {$doctor->name} ({$doctor->doctor_id}) has been added to {$doctor->department?->name}.",
+            url: route('doctors.show', $doctor->id),
+            type: 'doctor_created',
+            icon: 'fa-user-md',
+            color: 'emerald'
+        );
 
         return redirect()->route('doctors.show', $doctor)
             ->with('success', "Doctor {$doctor->name} ({$doctor->doctor_id}) added successfully.");
@@ -91,6 +106,18 @@ class DoctorController extends Controller
         ]);
 
         $doctor->update($validated);
+        $doctor->load(['department', 'user']);
+        $usersToNotify = $this->getDoctorRecipients($doctor);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Doctor Profile Updated',
+            message: "Profile details for Dr. {$doctor->name} ({$doctor->doctor_id}) have been updated.",
+            url: route('doctors.show', $doctor->id),
+            type: 'doctor_updated',
+            icon: 'fa-user-doctor',
+            color: 'blue'
+        );
 
         return redirect()->route('doctors.show', $doctor)
             ->with('success', "Doctor {$doctor->name} updated successfully.");
@@ -103,10 +130,38 @@ class DoctorController extends Controller
 
     public function destroy(Doctor $doctor)
     {
-        $name = $doctor->name;
+        $doctor->load(['department', 'user']);
+
+        $doctorName = $doctor->name;
+        $doctorId = $doctor->doctor_id;
+        $usersToNotify = $this->getDoctorRecipients($doctor);
+
         $doctor->delete();
 
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Doctor Record Removed',
+            message: "Doctor record for Dr. {$doctorName} ({$doctorId}) was removed.",
+            url: route('doctors.index'),
+            type: 'doctor_deleted',
+            icon: 'fa-user-slash',
+            color: 'rose'
+        );
+
         return redirect()->route('doctors.index')
-            ->with('success', "Doctor {$name} record deleted successfully.");
+            ->with('success', "Doctor {$doctorName} record deleted successfully.");
+    }
+
+    private function getDoctorRecipients(Doctor $doctor)
+    {
+        $users = collect();
+        $staffUsers = User::whereIn('role', ['super_admin', 'admin', 'hr', 'staff'])->get();
+        $users = $users->merge($staffUsers);
+
+        if ($doctor->user) {
+            $users->push($doctor->user);
+        }
+
+        return $users->unique('id');
     }
 }

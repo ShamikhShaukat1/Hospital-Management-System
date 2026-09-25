@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NotificationHelper;
 use App\Http\Requests\StorePatientRequest;
 use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -16,9 +18,9 @@ class PatientController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('patient_id', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('patient_id', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -30,7 +32,7 @@ class PatientController extends Controller
             $query->where('status', $request->status);
         }
 
-        $patients = $query->latest()->paginate(15)->withQueryString();
+        $patients = $query->latest()->paginate(10)->withQueryString();
 
         return view('patients.index', compact('patients'));
     }
@@ -50,6 +52,19 @@ class PatientController extends Controller
             $request->validated(),
             ['patient_id' => $patientId]
         ));
+
+        $patient->load('user');
+        $usersToNotify = $this->getPatientRecipients($patient);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'New Patient Registered',
+            message: "Patient {$patient->name} ({$patient->patient_id}) has been registered.",
+            url: route('patients.show', $patient->id),
+            type: 'patient_created',
+            icon: 'fa-user-plus',
+            color: 'teal'
+        );
 
         return redirect()->route('patients.show', $patient)
             ->with('success', "Patient {$patient->name} ({$patient->patient_id}) created successfully.");
@@ -81,6 +96,19 @@ class PatientController extends Controller
     public function update(StorePatientRequest $request, Patient $patient)
     {
         $patient->update($request->validated());
+        $patient->load('user');
+
+        $usersToNotify = $this->getPatientRecipients($patient);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Patient Profile Updated',
+            message: "Patient information for {$patient->name} ({$patient->patient_id}) has been updated.",
+            url: route('patients.show', $patient->id),
+            type: 'patient_updated',
+            icon: 'fa-user-pen',
+            color: 'blue'
+        );
 
         return redirect()->route('patients.show', $patient)
             ->with('success', "Patient {$patient->name} updated successfully.");
@@ -93,10 +121,39 @@ class PatientController extends Controller
 
     public function destroy(Patient $patient)
     {
-        $name = $patient->name;
+        $patient->load('user');
+
+        $patientName = $patient->name;
+        $patientId = $patient->patient_id;
+        $usersToNotify = $this->getPatientRecipients($patient);
+
         $patient->delete();
 
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Patient Record Deleted',
+            message: "Patient record for {$patientName} ({$patientId}) was removed.",
+            url: route('patients.index'),
+            type: 'patient_deleted',
+            icon: 'fa-user-xmark',
+            color: 'rose'
+        );
+
         return redirect()->route('patients.index')
-            ->with('success', "Patient record for {$name} deleted successfully.");
+            ->with('success', "Patient record for {$patientName} deleted successfully.");
+    }
+
+    private function getPatientRecipients(Patient $patient)
+    {
+        $users = collect();
+
+        $staffUsers = User::whereIn('role', ['super_admin', 'admin', 'receptionist', 'staff'])->get();
+        $users = $users->merge($staffUsers);
+
+        if ($patient->user) {
+            $users->push($patient->user);
+        }
+
+        return $users->unique('id');
     }
 }

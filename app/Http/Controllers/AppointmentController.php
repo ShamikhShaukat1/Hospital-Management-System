@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NotificationHelper;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -19,7 +21,7 @@ class AppointmentController extends Controller
             $search = $request->input('search');
             $query->whereHas('patient', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('patient_id', 'like', "%{$search}%");
+                    ->orWhere('patient_id', 'like', "%{$search}%");
             })->orWhereHas('doctor', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%");
             });
@@ -37,7 +39,7 @@ class AppointmentController extends Controller
             $query->whereDate('appointment_date', $request->date);
         }
 
-        $appointments = $query->latest('appointment_date')->paginate(15)->withQueryString();
+        $appointments = $query->latest('appointment_date')->paginate(10)->withQueryString();
         $doctors = Doctor::where('status', 'active')->get();
 
         return view('appointments.index', compact('appointments', 'doctors'));
@@ -54,7 +56,6 @@ class AppointmentController extends Controller
 
     public function store(StoreAppointmentRequest $request)
     {
-        // Prevent obvious scheduling conflicts for the doctor at that exact time
         $existing = Appointment::where('doctor_id', $request->doctor_id)
             ->where('appointment_date', $request->appointment_date)
             ->where('appointment_time', $request->appointment_time)
@@ -75,6 +76,20 @@ class AppointmentController extends Controller
             $request->validated(),
             ['appointment_id' => $appointmentId]
         ));
+
+        $appointment->load(['patient', 'doctor', 'department']);
+
+        $usersToNotify = $this->getAppointmentRecipients($appointment);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'New Appointment Scheduled',
+            message: "New appointment ({$appointment->appointment_id}) has been created.",
+            url: route('appointments.show', $appointment->id),
+            type: 'appointment_created',
+            icon: 'fa-calendar-plus',
+            color: 'emerald'
+        );
 
         return redirect()->route('appointments.show', $appointment)
             ->with('success', "Appointment {$appointment->appointment_id} scheduled successfully.");
@@ -109,6 +124,18 @@ class AppointmentController extends Controller
         ]);
 
         $appointment->update($validated);
+        $appointment->load(['patient', 'doctor', 'department']);
+        $usersToNotify = $this->getAppointmentRecipients($appointment);
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Appointment Updated',
+            message: "Appointment ({$appointment->appointment_id}) details have been updated.",
+            url: route('appointments.show', $appointment->id),
+            type: 'appointment_updated',
+            icon: 'fa-calendar-pen',
+            color: 'blue'
+        );
 
         return redirect()->route('appointments.show', $appointment)
             ->with('success', "Appointment updated successfully.");
@@ -121,9 +148,41 @@ class AppointmentController extends Controller
 
     public function destroy(Appointment $appointment)
     {
+        $appointment->load(['patient', 'doctor', 'department']);
+        $usersToNotify = $this->getAppointmentRecipients($appointment);
+        $appointmentId = $appointment->appointment_id;
+
         $appointment->delete();
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Appointment Cancelled',
+            message: "Appointment {$appointmentId} has been cancelled and removed.",
+            url: route('appointments.index'),
+            type: 'appointment_deleted',
+            icon: 'fa-calendar-xmark',
+            color: 'rose'
+        );
 
         return redirect()->route('appointments.index')
             ->with('success', "Appointment cancelled and removed.");
+    }
+
+    private function getAppointmentRecipients(Appointment $appointment)
+    {
+        $users = collect();
+
+        $adminUsers = User::whereIn('role', ['super_admin', 'admin'])->get();
+        $users = $users->merge($adminUsers);
+
+        if ($appointment->doctor?->user) {
+            $users->push($appointment->doctor->user);
+        }
+
+        if ($appointment->patient?->user) {
+            $users->push($appointment->patient->user);
+        }
+
+        return $users->unique('id');
     }
 }
