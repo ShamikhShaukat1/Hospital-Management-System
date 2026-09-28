@@ -39,17 +39,19 @@
                         @forelse($medicalRecords as $record)
                             <tr class="hover:bg-slate-50">
                                 <td class="p-3.5 px-6 font-semibold text-slate-800">
-                                    {{ $record->record_date->format('M d, Y') }}</td>
+                                    {{ \Carbon\Carbon::parse($record->record_date)->format('M d, Y') }}</td>
                                 <td class="p-3.5 px-6 font-bold text-slate-900">{{ $record->patient->name ?? '-' }}</td>
                                 <td class="p-3.5 px-6">Dr. {{ $record->doctor->name ?? '-' }}</td>
                                 <td class="p-3.5 px-6 font-semibold text-teal-800">{{ $record->diagnosis }}</td>
                                 <td class="p-3.5 px-6 max-w-xs truncate text-slate-500">
                                     {{ $record->treatment ?? 'Routine' }}</td>
-                                <td class="p-3.5 px-6 text-right">
+                                <td class="p-3.5 px-6 text-right space-x-2">
                                     <a href="{{ route('medical-records.show', $record) }}"
-                                        class="text-teal-700 font-semibold hover:underline">
-                                        View Full &rarr;
-                                    </a>
+                                        class="text-teal-700 hover:text-teal-900 font-semibold">View</a>
+                                    <a href="{{ route('medical-records.edit', $record) }}"
+                                        class="text-amber-600 hover:text-amber-800 font-semibold">Edit</a>
+                                    <a href="{{ route('medical-records.delete', $record) }}"
+                                        class="text-rose-600 hover:text-rose-800 font-semibold">Delete</a>
                                 </td>
                             </tr>
                         @empty
@@ -60,6 +62,12 @@
                     </tbody>
                 </table>
             </div>
+
+            @if ($medicalRecords->hasPages())
+                <div class="p-4 border-t border-slate-100">
+                    {{ $medicalRecords->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

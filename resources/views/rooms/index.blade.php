@@ -116,21 +116,14 @@
 
                                 <td class="py-3.5 px-4 text-right whitespace-nowrap text-xs font-semibold">
                                     <div class="flex items-center justify-end gap-3">
-                                        <a href="{{ route('beds.index', ['room_id' => $room->id]) }}"
-                                            class="text-teal-700 hover:underline mr-1">
-                                            Manage Beds
-                                        </a>
                                         <a href="{{ route('rooms.show', $room) }}"
-                                            class="text-slate-600 hover:text-teal-700">
-                                            View
+                                            class="text-teal-700 hover:text-teal-900 font-semibold">View</a>
                                         </a>
                                         <a href="{{ route('rooms.edit', $room) }}"
-                                            class="text-slate-600 hover:text-teal-700">
-                                            Edit
+                                            class="text-amber-600 hover:text-amber-800 font-semibold">Edit</a>
                                         </a>
                                         <a href="{{ route('rooms.delete', $room) }}"
-                                            class="text-rose-600 hover:text-rose-800">
-                                            Delete
+                                            class="text-rose-600 hover:text-rose-800 font-semibold">Delete</a>
                                         </a>
                                     </div>
                                 </td>

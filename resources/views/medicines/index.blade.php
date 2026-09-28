@@ -85,16 +85,13 @@
                                 </td>
                                 <td class="p-3.5 px-6 text-right space-x-1">
                                     <a href="{{ route('medicines.show', $med) }}"
-                                        class="p-1.5 text-slate-400 hover:text-teal-700" title="View">
-                                        <i class="far fa-eye"></i>
+                                        class="text-teal-700 hover:text-teal-900 font-semibold">View</a>
                                     </a>
                                     <a href="{{ route('medicines.edit', $med) }}"
-                                        class="p-1.5 text-slate-400 hover:text-indigo-600" title="Edit">
-                                        <i class="far fa-edit"></i>
+                                        class="text-amber-600 hover:text-amber-800 font-semibold">Edit</a>
                                     </a>
                                     <a href="{{ route('medicines.delete', $med) }}"
-                                        class="p-1.5 text-slate-400 hover:text-rose-600" title="Delete">
-                                        <i class="far fa-trash-alt"></i>
+                                        class="text-rose-600 hover:text-rose-800 font-semibold">Delete</a>
                                     </a>
                                 </td>
                             </tr>

@@ -46,18 +46,15 @@ class DischargeController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Lock record to prevent concurrent discharge submissions
-            $admission = Admission::where('id', $request->admission_id)
-                ->lockForUpdate()
-                ->firstOrFail();
+
+            $admission = Admission::where('id', $request->admission_id)->lockForUpdate()->firstOrFail();
 
             if ($admission->status !== 'Admitted') {
                 DB::rollBack();
-                return redirect()->route('admissions.show', $admission)
-                    ->withErrors(['admission' => 'This patient has already been discharged or transferred.']);
+
+                return redirect()->route('admissions.show', $admission)->withErrors(['admission' => 'This patient has already been discharged or transferred.']);
             }
 
-            // Create record with placeholder ID to prevent sequence collision
             $discharge = Discharge::create([
                 'discharge_id' => 'DIS-TEMP',
                 'admission_id' => $admission->id,
@@ -71,14 +68,10 @@ class DischargeController extends Controller
                 'status' => 'Finalized',
             ]);
 
-            // Assign unique padded ID based on primary key
             $dischargeId = 'DIS-' . str_pad($discharge->id, 5, '0', STR_PAD_LEFT);
             $discharge->update(['discharge_id' => $dischargeId]);
-
-            // Update admission status
             $admission->update(['status' => 'Discharged']);
 
-            // Free the bed if assigned
             $bedNumber = 'N/A';
             if ($admission->bed) {
                 $admission->bed->update(['status' => 'Available']);
@@ -87,8 +80,7 @@ class DischargeController extends Controller
 
             DB::commit();
 
-            return redirect()->route('discharges.show', $discharge)
-                ->with('success', "Patient successfully discharged. Bed {$bedNumber} is now marked Available.");
+            return redirect()->route('discharges.show', $discharge)->with('success', "Patient successfully discharged. Bed {$bedNumber} is now marked Available.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Discharge failed: ' . $e->getMessage()])->withInput();

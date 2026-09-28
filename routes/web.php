@@ -122,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/medical-records/{medical_record}', [MedicalRecordController::class, 'show'])->name('medical-records.show');
     Route::get('/medical-records/{medical_record}/edit', [MedicalRecordController::class, 'edit'])->name('medical-records.edit');
     Route::put('/medical-records/{medical_record}', [MedicalRecordController::class, 'update'])->name('medical-records.update');
+    Route::get('/medical-records/{medical_record}/delete', [MedicalRecordController::class, 'delete'])->name('medical-records.delete');
     Route::delete('/medical-records/{medical_record}', [MedicalRecordController::class, 'destroy'])->name('medical-records.destroy');
 
     /*
@@ -136,6 +137,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/prescriptions/{prescription}', [PrescriptionController::class, 'show'])->name('prescriptions.show');
     Route::get('/prescriptions/{prescription}/edit', [PrescriptionController::class, 'edit'])->name('prescriptions.edit');
     Route::put('/prescriptions/{prescription}', [PrescriptionController::class, 'update'])->name('prescriptions.update');
+    Route::get('/prescriptions/{prescription}/delete', [PrescriptionController::class, 'delete'])->name('prescriptions.delete');
     Route::delete('/prescriptions/{prescription}', [PrescriptionController::class, 'destroy'])->name('prescriptions.destroy');
 
     /*
@@ -225,6 +227,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])->name('admissions.show');
     Route::get('/admissions/{admission}/edit', [AdmissionController::class, 'edit'])->name('admissions.edit');
     Route::put('/admissions/{admission}', [AdmissionController::class, 'update'])->name('admissions.update');
+    Route::get('/admissions/{admission}/delete', [AdmissionController::class, 'delete'])->name('admissions.delete');
     Route::delete('/admissions/{admission}', [AdmissionController::class, 'destroy'])->name('admissions.destroy');
 
     /*

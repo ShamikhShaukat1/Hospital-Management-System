@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NotificationHelper;
 use App\Http\Requests\StoreAdmissionRequest;
 use App\Models\Admission;
 use App\Models\Bed;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Room;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -69,8 +71,20 @@ class AdmissionController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admissions.show', $admission)
-                ->with('success', "Patient successfully admitted to Room {$bed->room->room_number}, Bed {$bed->bed_number}.");
+            $admission->load(['patient', 'doctor', 'room', 'bed']);
+            $usersToNotify = $this->getStaffRecipients();
+
+            NotificationHelper::notifyUsers(
+                users: $usersToNotify,
+                title: 'New Patient Admitted',
+                message: "Patient {$admission->patient->name} was admitted to Room {$admission->room->room_number}, Bed {$admission->bed->bed_number} under Dr. {$admission->doctor->name}.",
+                url: route('admissions.show', $admission->id),
+                type: 'admission_created',
+                icon: 'fa-hospital-user',
+                color: 'teal'
+            );
+
+            return redirect()->route('admissions.show', $admission)->with('success', "Patient successfully admitted to Room {$bed->room->room_number}, Bed {$bed->bed_number}.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Admission failed: ' . $e->getMessage()])->withInput();
@@ -85,6 +99,7 @@ class AdmissionController extends Controller
 
     public function edit(Admission $admission)
     {
+        $admission->load(['patient', 'doctor', 'room', 'bed']);
         $doctors = Doctor::where('status', 'active')->get();
         $rooms = Room::all();
         $beds = Bed::where('room_id', $admission->room_id)->get();
@@ -96,15 +111,75 @@ class AdmissionController extends Controller
     {
         $validated = $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'reason' => 'required|string',
+            'reason'    => 'required|string',
             'diagnosis' => 'required|string',
-            'notes' => 'nullable|string',
-            'status' => 'required|in:Admitted,Discharged,Transferred',
+            'notes'     => 'nullable|string',
+            'status'    => 'required|in:Admitted,Discharged,Transferred',
         ]);
 
+        $oldStatus = $admission->status;
         $admission->update($validated);
+        $admission->load(['patient', 'doctor', 'room', 'bed']);
 
-        return redirect()->route('admissions.show', $admission)
-            ->with('success', "Admission record updated.");
+        $statusChangeNotice = ($oldStatus !== $admission->status) ? " Status updated from {$oldStatus} to {$admission->status}." : "";
+        $usersToNotify = $this->getStaffRecipients();
+
+        NotificationHelper::notifyUsers(
+            users: $usersToNotify,
+            title: 'Admission Record Updated',
+            message: "Admission record for {$admission->patient->name} ({$admission->admission_id}) has been updated.{$statusChangeNotice}",
+            url: route('admissions.show', $admission->id),
+            type: 'admission_updated',
+            icon: 'fa-user-pen',
+            color: 'blue'
+        );
+
+        return redirect()->route('admissions.show', $admission)->with('success', "Admission record updated.");
+    }
+
+    public function delete(Admission $admission)
+    {
+        $admission->load(['patient', 'doctor', 'room', 'bed']);
+        return view('admissions.delete', compact('admission'));
+    }
+
+    public function destroy(Admission $admission)
+    {
+        $admission->load(['patient', 'bed']);
+        $patientName = $admission->patient->name ?? 'Patient';
+        $admissionId = $admission->admission_id;
+
+        DB::beginTransaction();
+        try {
+            if ($admission->bed && $admission->status === 'Admitted') {
+                $admission->bed->update(['status' => 'Available']);
+            }
+
+            $admission->delete();
+
+            DB::commit();
+
+            $usersToNotify = $this->getStaffRecipients();
+
+            NotificationHelper::notifyUsers(
+                users: $usersToNotify,
+                title: 'Admission Record Removed',
+                message: "Admission record {$admissionId} for {$patientName} was permanently removed.",
+                url: route('admissions.index'),
+                type: 'admission_deleted',
+                icon: 'fa-trash-can',
+                color: 'rose'
+            );
+
+            return redirect()->route('admissions.index')->with('success', "Admission record for {$patientName} removed.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Delete failed: ' . $e->getMessage()]);
+        }
+    }
+
+    private function getStaffRecipients()
+    {
+        return User::whereIn('role', ['super_admin', 'admin', 'doctor', 'nurse'])->get();
     }
 }
