@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Management System</title>
+    <title>CarePoint Hospital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0F766E',
+                        primary: {
+                            DEFAULT: '#0F766E',
+                            hover: '#115E59',
+                            light: '#F0FDFA'
+                        },
                         secondary: '#14B8A6'
                     }
                 }
@@ -21,98 +25,218 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-        <div class="text-center mb-8">
-            <div
-                class="inline-flex w-14 h-14 rounded-2xl bg-teal-700 text-white items-center justify-center text-2xl mb-3 shadow-lg shadow-teal-700/30">
-                <i class="fas fa-hospital-symbol"></i>
+<body class="bg-slate-900 min-h-screen font-sans antialiased text-slate-800">
+    <div class="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12">
+        <div
+            class="lg:col-span-7 relative bg-slate-900 hidden lg:flex flex-col justify-between p-12 lg:p-16 overflow-hidden min-h-screen select-none">
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1600"
+                    alt="CarePoint Hospital Facility"
+                    class="w-full h-full object-cover opacity-30 filter brightness-90">
+                <div class="absolute inset-0 bg-gradient-to-t from-teal-950 via-teal-900/85 to-slate-900/70"></div>
             </div>
-            <h2 class="text-2xl font-bold text-slate-800">CarePoint Hospital</h2>
-            <p class="text-sm text-slate-500 mt-1">Hospital Management System & Portal</p>
+
+            <div class="relative z-10 flex items-center gap-3.5">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-2xl shadow-xl">
+                    <i class="fas fa-hospital-symbol text-secondary"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-white tracking-wide">CarePoint</h1>
+                    <p class="text-xs text-teal-200/80 uppercase tracking-widest font-semibold">Hospital Management
+                        System</p>
+                </div>
+            </div>
+
+            <div class="relative z-10 my-auto py-12 max-w-xl">
+                <span
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-teal-500/20 text-teal-300 border border-teal-500/30 mb-6 backdrop-blur-sm">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Smart Hospital Management Portal
+                </span>
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-6">
+                    Excellence in Patient Care & Clinical Operations
+                </h2>
+                <p class="text-teal-100/80 text-base leading-relaxed mb-10">
+                    A unified workspace empowering healthcare professionals to manage medical records, patient care, and
+                    administrative tasks seamlessly.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
+                        <div class="text-secondary text-xl mb-2"><i class="fas fa-shield-heart"></i></div>
+                        <h4 class="text-sm font-semibold text-white">HIPAA Compliant</h4>
+                        <p class="text-xs text-teal-200/70 mt-0.5">Enterprise medical data security</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
+                        <div class="text-secondary text-xl mb-2"><i class="fas fa-user-md"></i></div>
+                        <h4 class="text-sm font-semibold text-white">Multi-Role Access</h4>
+                        <p class="text-xs text-teal-200/70 mt-0.5">Tailored dashboards for staff</p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-teal-200/60">
+                <span>© {{ date('Y') }} CarePoint Hospital Network</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-lock text-[10px]"></i> 256-Bit SSL
+                    Encrypted</span>
+            </div>
         </div>
 
-        @if (session('success'))
-            <div class="mb-4 p-3 rounded-lg bg-emerald-50 text-emerald-800 text-sm border border-emerald-200">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="mb-4 p-3 rounded-lg bg-rose-50 text-rose-800 text-sm border border-rose-200">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
-            @csrf
+        <div class="lg:col-span-5 bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-between min-h-screen">
             <div>
-                <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                        <i class="far fa-envelope"></i>
-                    </span>
-                    <input type="email" id="email" name="email" value="{{ old('email', 'admin@example.com') }}"
-                        required
-                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent text-sm">
+                <div class="flex lg:hidden items-center justify-center gap-3 mb-8 text-center">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center text-2xl shadow-lg shadow-teal-700/20">
+                        <i class="fas fa-hospital-symbol"></i>
+                    </div>
+                    <div class="text-left">
+                        <h2 class="text-xl font-bold text-slate-800">CarePoint</h2>
+                        <p class="text-xs text-slate-500">Hospital Portal</p>
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                        <i class="fas fa-lock"></i>
-                    </span>
-                    <input type="password" id="password" name="password" value="password" required
-                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent text-sm">
+                <div class="mb-8">
+                    <h3 class="text-3xl font-bold text-slate-900 tracking-tight">Sign In</h3>
+                    <p class="text-sm text-slate-500 mt-1">Welcome back! Access your portal account below.</p>
                 </div>
+
+                @if (session('success'))
+                    <div
+                        class="mb-6 p-4 rounded-xl bg-emerald-50 text-emerald-800 text-sm border border-emerald-200/80 flex items-center gap-3">
+                        <i class="fas fa-check-circle text-emerald-600"></i>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div
+                        class="mb-6 p-4 rounded-xl bg-rose-50 text-rose-800 text-sm border border-rose-200/80 flex items-center gap-3">
+                        <i class="fas fa-exclamation-circle text-rose-600"></i>
+                        <span>{{ $errors->first() }}</span>
+                    </div>
+                @endif
+
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Quick Select
+                            Role</span>
+                        <span
+                            class="text-[11px] font-medium text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">Demo
+                            Mode</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                        <button type="button" id="role-admin" onclick="fillRole('admin@example.com', 'admin')"
+                            class="role-btn py-2 text-xs font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900 bg-white shadow-sm font-semibold text-slate-800">
+                            Admin
+                        </button>
+                        <button type="button" id="role-doctor" onclick="fillRole('doctor@example.com', 'doctor')"
+                            class="role-btn py-2 text-xs font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                            Doctor
+                        </button>
+                        <button type="button" id="role-nurse" onclick="fillRole('nurse@example.com', 'nurse')"
+                            class="role-btn py-2 text-xs font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                            Nurse
+                        </button>
+                        <button type="button" id="role-pharmacist"
+                            onclick="fillRole('pharmacist@example.com', 'pharmacist')"
+                            class="role-btn py-2 text-xs font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                            Pharmacy
+                        </button>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
+                    @csrf
+
+                    <div>
+                        <label for="email" class="block text-xs font-medium text-slate-600 mb-1">Email
+                            Address</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-4 text-slate-400">
+                                <i class="far fa-envelope text-sm"></i>
+                            </span>
+                            <input type="email" id="email" name="email"
+                                value="{{ old('email', 'admin@example.com') }}" required
+                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-150">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="password" class="block text-xs font-medium text-slate-600">Password</label>
+                            <a href="#" class="text-xs text-primary font-medium hover:underline">Forgot
+                                password?</a>
+                        </div>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-4 text-slate-400">
+                                <i class="fas fa-lock text-sm"></i>
+                            </span>
+                            <input type="password" id="password" name="password" value="password" required
+                                class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-150">
+                            <button type="button" onclick="togglePasswordVisibility()"
+                                class="absolute right-3.5 text-slate-400 hover:text-slate-600 p-1">
+                                <i id="eye-icon" class="far fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center pt-1">
+                        <label class="flex items-center text-slate-600 cursor-pointer group">
+                            <input type="checkbox" name="remember"
+                                class="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary cursor-pointer">
+                            <span
+                                class="ml-2 text-xs font-medium text-slate-600 group-hover:text-slate-800 transition">Keep
+                                me signed in</span>
+                        </label>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3.5 px-5 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl shadow-md shadow-teal-700/15 transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center justify-center gap-2 text-sm">
+                        <span>Sign In to Dashboard</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
             </div>
 
-            <div class="flex items-center justify-between text-sm">
-                <label class="flex items-center text-slate-600 cursor-pointer">
-                    <input type="checkbox" name="remember"
-                        class="w-4 h-4 text-teal-600 rounded border-slate-300 focus:ring-teal-500">
-                    <span class="ml-2">Remember me</span>
-                </label>
-                <a href="#" class="text-teal-700 hover:underline font-medium">Forgot password?</a>
+            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                <p class="text-xs text-slate-400">
+                    Need technical assistance? <a href="#"
+                        class="text-slate-600 font-medium hover:underline">Contact IT Support</a>
+                </p>
             </div>
 
-            <button type="submit"
-                class="w-full py-2.5 px-4 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-lg shadow-md shadow-teal-700/20 transition duration-150 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                Sign In to Portal
-            </button>
-        </form>
-
-        <div class="mt-8 pt-6 border-t border-slate-200">
-            <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 text-center">
-                Demo Accounts (Password: <code class="text-teal-700">password</code>)
-            </div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-                <button type="button" onclick="fillCreds('admin@example.com')"
-                    class="p-2 rounded bg-slate-50 hover:bg-teal-50 border border-slate-200 text-slate-700 text-left font-medium">
-                    <span class="text-teal-700 font-bold block">Admin</span> admin@example.com
-                </button>
-                <button type="button" onclick="fillCreds('doctor@example.com')"
-                    class="p-2 rounded bg-slate-50 hover:bg-teal-50 border border-slate-200 text-slate-700 text-left font-medium">
-                    <span class="text-teal-700 font-bold block">Doctor</span> doctor@example.com
-                </button>
-                <button type="button" onclick="fillCreds('nurse@example.com')"
-                    class="p-2 rounded bg-slate-50 hover:bg-teal-50 border border-slate-200 text-slate-700 text-left font-medium">
-                    <span class="text-teal-700 font-bold block">Nurse</span> nurse@example.com
-                </button>
-                <button type="button" onclick="fillCreds('pharmacist@example.com')"
-                    class="p-2 rounded bg-slate-50 hover:bg-teal-50 border border-slate-200 text-slate-700 text-left font-medium">
-                    <span class="text-teal-700 font-bold block">Pharmacist</span> pharmacist@example.com
-                </button>
-            </div>
         </div>
     </div>
 
     <script>
-        function fillCreds(email) {
+        function fillRole(email, roleKey) {
             document.getElementById('email').value = email;
             document.getElementById('password').value = 'password';
+
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.className =
+                    'role-btn py-2 text-xs font-medium rounded-lg transition-all text-slate-600 hover:text-slate-900';
+            });
+
+            const activeBtn = document.getElementById(`role-${roleKey}`);
+            if (activeBtn) {
+                activeBtn.className =
+                    'role-btn py-2 text-xs rounded-lg transition-all bg-white shadow-sm font-semibold text-slate-900';
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.className = 'far fa-eye-slash text-sm';
+            } else {
+                passInput.type = 'password';
+                eyeIcon.className = 'far fa-eye text-sm';
+            }
         }
     </script>
 </body>
