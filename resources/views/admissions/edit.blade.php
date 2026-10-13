@@ -18,17 +18,6 @@
                 </a>
             </div>
 
-            @if ($errors->any())
-                <div class="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700">
-                    <p class="font-bold mb-1">Please fix the following errors:</p>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('admissions.update', $admission) }}" class="space-y-4">
                 @csrf
                 @method('PUT')

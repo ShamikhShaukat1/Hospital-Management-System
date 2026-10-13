@@ -8,18 +8,6 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
             <h3 class="text-lg font-bold text-slate-800 pb-3 mb-4 border-b">Pharmacy Item Form</h3>
 
-            {{-- Display Validation Errors Summary --}}
-            @if ($errors->any())
-                <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                    <p class="font-semibold mb-1">Please review the errors below:</p>
-                    <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('medicines.store') }}" class="space-y-4">
                 @csrf
 

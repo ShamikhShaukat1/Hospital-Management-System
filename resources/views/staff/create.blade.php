@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Add Staff Member')
 @section('page_title', 'Register New Staff Member')
 

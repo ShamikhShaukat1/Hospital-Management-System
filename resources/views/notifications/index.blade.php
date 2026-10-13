@@ -1,12 +1,10 @@
 @extends('layouts.app')
-
 @section('title', 'Notifications')
 @section('page_title', 'Notifications')
 
 @section('content')
 
     <div class="max-w-5xl mx-auto">
-
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-slate-800">
@@ -32,7 +30,6 @@
         </div>
 
         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-
             @forelse ($notifications as $notification)
 
                 @php
@@ -57,25 +54,17 @@
                 @endphp
 
                 <div
-                    class="px-6 py-5 border-b border-slate-100 last:border-b-0
-                    {{ $isUnread ? 'bg-teal-50/40' : 'bg-white' }}
-                    hover:bg-slate-50 transition-colors">
-
+                    class="px-6 py-5 border-b border-slate-100 last:border-b-0 {{ $isUnread ? 'bg-teal-50/40' : 'bg-white' }} hover:bg-slate-50 transition-colors">
                     <div class="flex items-start gap-4">
-
                         <div
-                            class="w-11 h-11 rounded-xl {{ $iconContainer }}
-                            flex items-center justify-center flex-shrink-0">
+                            class="w-11 h-11 rounded-xl {{ $iconContainer }} flex items-center justify-center flex-shrink-0">
                             <i class="fas {{ $icon }}"></i>
                         </div>
 
                         <div class="flex-1 min-w-0">
-
                             <div class="flex items-start justify-between gap-4">
-
                                 <div>
                                     <div class="flex items-center gap-2">
-
                                         <h3 class="font-semibold text-slate-800">
                                             {{ $data['title'] ?? 'Notification' }}
                                         </h3>
@@ -83,7 +72,6 @@
                                         @if ($isUnread)
                                             <span class="w-2 h-2 rounded-full bg-teal-600" title="Unread"></span>
                                         @endif
-
                                     </div>
 
                                     <p class="text-sm text-slate-600 mt-1">
@@ -99,7 +87,6 @@
 
                             @if (!empty($data['patient_name']) || !empty($data['doctor_name']))
                                 <div class="mt-3 flex flex-wrap gap-2">
-
                                     @if (!empty($data['patient_name']))
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs">
@@ -167,19 +154,14 @@
                                         Delete
                                     </button>
                                 </form>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
             @empty
 
                 <div class="py-16 text-center">
-
                     <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
                         <i class="far fa-bell-slash text-2xl"></i>
                     </div>
@@ -191,7 +173,6 @@
                     <p class="mt-1 text-sm text-slate-500">
                         You're all caught up.
                     </p>
-
                 </div>
 
             @endforelse
@@ -199,10 +180,7 @@
         </div>
 
         @if ($notifications->hasPages())
-
             <div class="mt-6 flex items-center justify-between">
-
-                {{-- Showing count --}}
                 <div class="text-sm text-slate-500">
                     Showing
                     <span class="font-semibold text-slate-700">
@@ -219,10 +197,7 @@
                     notifications
                 </div>
 
-                {{-- Pagination --}}
                 <div class="flex items-center gap-2">
-
-                    {{-- Previous --}}
                     @if ($notifications->onFirstPage())
                         <span
                             class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-400 text-xs font-semibold cursor-not-allowed">
@@ -237,8 +212,6 @@
                         </a>
                     @endif
 
-
-                    {{-- Page Numbers --}}
                     @foreach ($notifications->getUrlRange(1, $notifications->lastPage()) as $page => $url)
                         @if ($page == $notifications->currentPage())
                             <span
@@ -253,8 +226,6 @@
                         @endif
                     @endforeach
 
-
-                    {{-- Next --}}
                     @if ($notifications->hasMorePages())
                         <a href="{{ $notifications->nextPageUrl() }}"
                             class="inline-flex items-center px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold transition-colors">
@@ -268,13 +239,9 @@
                             <i class="fas fa-chevron-right ml-1.5"></i>
                         </span>
                     @endif
-
                 </div>
-
             </div>
-
         @endif
-
     </div>
 
 @endsection

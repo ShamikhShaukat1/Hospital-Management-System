@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Edit Nurse')
 @section('page_title', 'Edit Nurse Details')
 

@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Rooms & Wards')
 @section('page_title', 'Hospital Rooms & Wards')
 
@@ -20,12 +19,6 @@
                 </a>
             </div>
         </div>
-
-        @if (session('success'))
-            <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm font-medium">
-                {{ session('success') }}
-            </div>
-        @endif
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
             <form method="GET" action="{{ route('rooms.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">

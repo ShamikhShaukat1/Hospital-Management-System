@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Payments')
 @section('page_title', 'Hospital Revenue & Payment Receipts')
 

@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Add New Room')
 @section('page_title', 'Configure New Hospital Room')
 

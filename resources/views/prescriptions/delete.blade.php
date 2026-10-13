@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Delete Prescription')
 @section('page_title', 'Confirm Deletion')
 

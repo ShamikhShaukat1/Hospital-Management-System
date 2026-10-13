@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Payment Receipt - ' . $payment->payment_id)
 @section('page_title', 'Payment Receipt')
 

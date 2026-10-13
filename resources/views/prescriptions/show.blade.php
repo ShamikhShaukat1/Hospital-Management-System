@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Rx - ' . $prescription->prescription_id)
 @section('page_title', 'Prescription Preview')
 
@@ -76,7 +75,8 @@
                                     {{ $item->medicine->name ?? 'Medicine' }}
                                     <span
                                         class="block text-xs font-normal text-slate-500">{{ $item->medicine->generic_name ?? '' }}
-                                        ({{ $item->medicine->category ?? '' }})</span>
+                                        ({{ $item->medicine->category ?? '' }})
+                                    </span>
                                 </td>
                                 <td class="py-3 font-semibold text-slate-700">{{ $item->dosage }}</td>
                                 <td class="py-3 text-slate-700">{{ $item->frequency }}</td>

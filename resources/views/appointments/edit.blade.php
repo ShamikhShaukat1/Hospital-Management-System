@@ -14,17 +14,6 @@
                 </span>
             </div>
 
-            @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs mb-6">
-                    <div class="font-bold mb-1">Please address the following errors:</div>
-                    <ul class="list-disc list-inside space-y-0.5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('appointments.update', $appointment) }}" class="space-y-4">
                 @csrf
                 @method('PUT')

@@ -1,16 +1,9 @@
 @extends('layouts.app')
-
 @section('title', 'Staff Profile')
 @section('page_title', 'Staff Member Details')
 
 @section('content')
     <div class="max-w-3xl mx-auto space-y-6">
-        @if (session('success'))
-            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-medium">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="p-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div>

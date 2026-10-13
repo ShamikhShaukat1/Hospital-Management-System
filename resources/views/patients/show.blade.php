@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', $patient->name . ' - Medical File')
 @section('page_title', 'Patient Complete Medical File')
 
@@ -147,7 +146,8 @@
                                 @foreach ($rx->items as $item)
                                     <li class="flex items-center justify-between text-slate-700 font-medium">
                                         <span>&bull; {{ $item->medicine->name ?? 'Medicine' }}
-                                            ({{ $item->dosage }})</span>
+                                            ({{ $item->dosage }})
+                                        </span>
                                         <span class="text-slate-500 text-[11px]">{{ $item->frequency }} &bull;
                                             {{ $item->duration }}</span>
                                     </li>
@@ -173,7 +173,8 @@
                                 <span class="text-slate-500 ml-1">Room {{ $adm->room->room_number ?? '-' }}, Bed
                                     {{ $adm->bed->bed_number ?? '-' }}</span>
                                 <div class="text-slate-600 mt-0.5">{{ $adm->diagnosis }}
-                                    ({{ $adm->admission_date->format('M d, Y') }})</div>
+                                    ({{ $adm->admission_date->format('M d, Y') }})
+                                </div>
                             </div>
                             <span
                                 class="px-2 py-0.5 rounded font-semibold {{ $adm->status === 'Admitted' ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-700' }}">

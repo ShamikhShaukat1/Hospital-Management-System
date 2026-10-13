@@ -8,17 +8,6 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
             <h3 class="text-lg font-bold text-slate-800 pb-3 mb-4 border-b">Inpatient Admission Registration</h3>
 
-            @if ($errors->any())
-                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                    <p class="font-semibold mb-1">Please review the errors below:</p>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('admissions.store') }}" class="space-y-4">
                 @csrf
 
@@ -89,7 +78,6 @@
                     </div>
                 </div>
 
-                <!-- Date & Time Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Admission Date *</label>

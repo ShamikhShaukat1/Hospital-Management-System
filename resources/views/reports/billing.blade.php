@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Financial Revenue Report')
 @section('page_title', 'Hospital Financial & Billing Report')
 

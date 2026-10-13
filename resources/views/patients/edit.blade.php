@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Edit Patient - ' . $patient->name)
 @section('page_title', 'Edit Patient Record')
 

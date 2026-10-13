@@ -5,22 +5,6 @@
 
 @section('content')
     <div class="space-y-6">
-        @if (session('success'))
-            <div
-                class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between">
-                <div>{{ session('success') }}</div>
-                <button onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900">&times;</button>
-            </div>
-        @endif
-
-        @if ($errors->has('error'))
-            <div
-                class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-between">
-                <div>{{ $errors->first('error') }}</div>
-                <button onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-900">&times;</button>
-            </div>
-        @endif
-
         <div
             class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <form method="GET" action="{{ route('users.index') }}"
@@ -105,13 +89,11 @@
                                 </span>
                             </td>
                             <td class="p-3.5 px-6 text-right space-x-2">
-                                <a href="{{ route('users.show', $user) }}" class="p-1.5 text-slate-400 hover:text-teal-600"
-                                    title="View Details">
-                                    <i class="far fa-eye"></i>
+                                <a href="{{ route('users.show', $user) }}"
+                                    class="text-teal-700 hover:text-teal-900 font-semibold">View</a>
                                 </a>
                                 <a href="{{ route('users.edit', $user) }}"
-                                    class="p-1.5 text-slate-400 hover:text-indigo-600" title="Edit User">
-                                    <i class="far fa-edit"></i>
+                                    class="text-amber-600 hover:text-amber-800 font-semibold">Edit</a>
                                 </a>
                             </td>
                         </tr>

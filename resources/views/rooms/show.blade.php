@@ -1,16 +1,9 @@
 @extends('layouts.app')
-
 @section('title', 'Room ' . $room->room_number)
 @section('page_title', 'Room Overview')
 
 @section('content')
     <div class="space-y-6 max-w-4xl mx-auto">
-        @if (session('success'))
-            <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm font-medium">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
                 <div>

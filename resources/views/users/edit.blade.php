@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Edit User')
 @section('page_title', 'Update User Credentials & Permissions')
 
@@ -9,17 +8,6 @@
             <h3 class="text-lg font-bold text-slate-800 pb-3 mb-6 border-b">
                 Edit User: {{ $user->name }}
             </h3>
-
-            @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs mb-6">
-                    <div class="font-bold mb-1">Please address the following errors:</div>
-                    <ul class="list-disc list-inside space-y-0.5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
             <form method="POST" action="{{ route('users.update', $user) }}" class="space-y-4">
                 @csrf

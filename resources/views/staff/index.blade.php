@@ -1,16 +1,9 @@
 @extends('layouts.app')
-
 @section('title', 'Hospital Staff')
 @section('page_title', 'Administrative & Operational Staff')
 
 @section('content')
     <div class="space-y-6">
-        @if (session('success'))
-            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-medium">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div
             class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <form method="GET" action="{{ route('staff.index') }}" class="flex items-center gap-3 w-full md:w-auto">

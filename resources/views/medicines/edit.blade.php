@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Edit Medicine')
 @section('page_title', 'Edit Medicine Inventory')
 
@@ -15,17 +14,6 @@
                     <i class="fas fa-arrow-left"></i> Back to Inventory
                 </a>
             </div>
-
-            @if ($errors->any())
-                <div class="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700">
-                    <p class="font-bold mb-1">Please fix the following errors:</p>
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
             <form method="POST" action="{{ route('medicines.update', $medicine) }}" class="space-y-6">
                 @csrf

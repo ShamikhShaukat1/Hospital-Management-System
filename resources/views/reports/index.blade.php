@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Hospital Reports')
 @section('page_title', 'Analytics, Reports & Audit Exports')
 

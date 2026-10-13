@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Pharmacy Inventory')
 @section('page_title', 'Pharmacy & Medicine Inventory')
 

@@ -10,17 +10,6 @@
                 Discharge Patient: {{ $admission->patient->name ?? 'Patient' }}
             </h3>
 
-            @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs mb-6">
-                    <div class="font-bold mb-1">Please fix the following errors:</div>
-                    <ul class="list-disc list-inside space-y-0.5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <div class="bg-teal-50 border border-teal-200 p-4 rounded-xl text-xs text-teal-900 mb-6">
                 <span class="font-bold">Admission Reference:</span> {{ $admission->admission_id }} &bull;
                 Room {{ $admission->room->room_number ?? '-' }}, Bed {{ $admission->bed->bed_number ?? '-' }} &bull;

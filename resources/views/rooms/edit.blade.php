@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Edit Room')
 @section('page_title', 'Edit Room ' . $room->room_number)
 

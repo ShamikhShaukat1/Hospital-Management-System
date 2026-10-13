@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'User Profile - ' . $user->name)
 @section('page_title', 'User Profile & Permissions')
 

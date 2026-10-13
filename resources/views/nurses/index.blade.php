@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Nurses')
 @section('page_title', 'Nursing Staff Directory')
 

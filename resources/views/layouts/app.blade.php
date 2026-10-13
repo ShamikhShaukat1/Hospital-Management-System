@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') - Hospital Management System</title>
+    <link rel="icon" type="image/png" href="{{ asset('carepoint-favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -192,33 +193,10 @@
         </header>
 
         <main class="flex-1 overflow-y-auto p-6 md:p-8">
-            @if (session('success'))
-                <div
-                    class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-start space-x-3 shadow-sm animate-fade-in">
-                    <i class="fas fa-circle-check text-emerald-600 text-lg mt-0.5"></i>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-emerald-900">Success</h4>
-                        <p class="text-sm mt-0.5">{{ session('success') }}</p>
-                    </div>
-                </div>
-            @endif
 
-            @if ($errors->any())
-                <div
-                    class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start space-x-3 shadow-sm">
-                    <i class="fas fa-triangle-exclamation text-rose-600 text-lg mt-0.5"></i>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-rose-900">Please review the errors below:</h4>
-                        <ul class="list-disc pl-5 text-sm mt-1 space-y-0.5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @endif
-
+            @include('components.alerts')
             @yield('content')
+
         </main>
     </div>
 

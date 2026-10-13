@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'Write Prescription')
 @section('page_title', 'Create Electronic Prescription')
 
